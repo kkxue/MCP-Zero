@@ -1,7 +1,10 @@
 import json
+import os
 from typing import List, Dict, Any
 
-from .matcher import ToolMatcher
+from matcher import ToolMatcher
+from dotenv import load_dotenv
+load_dotenv()
 
 
 def load_test_cases(jsonl_path: str) -> List[Dict[str, Any]]:
@@ -50,10 +53,9 @@ def main():
     matcher.load_data(data_path)
     
     # Setup OpenAI client
-    base_url = ""
-    api_version = ""
-    api_key = ""
-    matcher.setup_openai_client(base_url, api_version, api_key)
+    base_url = os.getenv("BASE_URL")
+    api_key = os.getenv("API_KEY")
+    matcher.setup_openai_client(base_url, api_key)
     
     # Load test cases
     test_cases = load_test_cases(test_cases_path)

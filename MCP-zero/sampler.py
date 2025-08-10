@@ -88,7 +88,7 @@ class ToolSampler:
         if not all_sampled_tools:
             raise ValueError
         
-        target_index = max(0, min(len(all_sampled_tools)-1, position_index))
+        target_index = max(0, min(len(all_sampled_tools)-1, int(position_index)))
         target_server, target_tool = all_sampled_tools[target_index]        
         return target_server, target_tool
     
@@ -119,7 +119,7 @@ class ToolSampler:
 
 
 if __name__ == "__main__":
-    data_path = "./mcp-tools/mcp_tools_with_embedding.json"
+    data_path = "../mcp-tools/mcp_tools_with_embedding.json"
     sampler = ToolSampler(data_path)
     sampled_data = sampler.sample_tools(5)
     

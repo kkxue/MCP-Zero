@@ -12,10 +12,13 @@ import re
 import numpy as np
 from typing import List, Dict, Any, Tuple, Optional
 
-# 添加上级目录到系统路径，以便导入call_openai模块
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-from call_openai.function_call_gpt import chat_any
-from call_openai.call_embed import embeddings
+from dotenv import load_dotenv
+from openai import OpenAI
+
+load_dotenv()
+
+base_url = os.getenv("BASE_URL")
+api_key = os.getenv("API_KEY")
 
 def load_json_data(file_path: str) -> List[Dict[str, Any]]:
     """
@@ -95,7 +98,16 @@ def get_embedding_for_description(description: str) -> List[float]:
         Embedding vector
     """
     try:
-        return embeddings(description)
+        client = OpenAI(
+            api_key=api_key,
+            base_url=base_url
+        )
+
+        response = client.embeddings.create(
+            model="text-embedding-3-large",
+            input=description
+        )
+        return response.data[0].embedding
     except Exception as e:
         print(f"Error getting embedding: {e}")
         # Return empty vector in case of error
@@ -196,7 +208,19 @@ def test_tool_retrieval(system_prompt: str,
     
     # Call the model
     try:
-        response = chat_any(system_prompt, user_query, model_name)
+        client = OpenAI(
+            api_key=api_key,
+            base_url=base_url
+        )
+
+        completion = client.chat.completions.create(
+            model=model_name,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_query}
+            ]
+        )
+        response = completion.choices[0].message.content
         return response.strip()
     except Exception as e:
         print(f"Error calling model: {e}")
@@ -341,7 +365,7 @@ def main():
             tool_description = extract_tool_description(model_response)
             print(f"Extracted description: {tool_description}")
             
-            Get embedding for the description
+            # Get embedding for the description
             
             # # [baseline experiment]: use the user query as the description
             # model_response = user_query

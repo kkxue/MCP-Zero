@@ -3,7 +3,7 @@ import numpy as np
 import re
 import time
 from typing import List, Dict, Any, Tuple, Optional
-import openai
+from openai import OpenAI
 
 
 class ToolMatcher:
@@ -40,18 +40,16 @@ class ToolMatcher:
         except Exception as e:
             raise ValueError(f"Error loading tool data: {e}")
     
-    def setup_openai_client(self, base_url: str, api_version: str, api_key: str) -> None:
+    def setup_openai_client(self, base_url: str, api_key: str) -> None:
         """
         Setup the OpenAI client
         
         Args:
             base_url: The base URL of the OpenAI API
-            api_version: The version of the OpenAI API
             api_key: The API key
         """
-        self.openai_client = openai.AzureOpenAI(
-            azure_endpoint=base_url,
-            api_version=api_version,
+        self.openai_client = OpenAI(
+            base_url=base_url,
             api_key=api_key,
         )
     
